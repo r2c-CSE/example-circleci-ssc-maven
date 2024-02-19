@@ -20,12 +20,14 @@ jobs:
     docker:
       - image: returntocorp/semgrep
     steps:
-      - checkout
       - attach_workspace: # This step attaches the workspace from the previous job
           at: /workspace 
+      - checkout
       - run: 
          name: Semgrep full scan
-         command: semgrep ci 
+         command: |
+           ls /workspace/target
+           semgrep ci 
          
 workflows:
   version: 2
