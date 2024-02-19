@@ -1,60 +1,35 @@
 version: 2.1
 
-orbs:
-  maven: circleci/maven@1.0.1 # Use the Maven orb for simplified Maven execution
-  
-workflows:
-  semgrep:
-    jobs:
-      - semgrep-full-scan:
-          filters:
-            branches:
-              only: main
-          context:
-            - semgrep
-      - semgrep-diff-scan:
-          filters:
-            branches:
-              ignore: main
-          context:
-            - semgrep
 jobs:
-  semgrep-full-scan:
+  build:
     docker:
-      - image: cimg/openjdk:17.0 # Use an image with Java installed
+      - image: cimg/openjdk:17.0
     steps:
       - checkout
-      - maven/with_cache: # Cache Maven dependencies to speed up builds
-          steps:
-            - run: |
-                mkdir target
-                mvn dependency:tree -DoutputFile=target/maven_dep_tree.txt
+      - run: 
+          name: Generate Dependency File
+          command: |
+            mkdir target
+            mvn dependency:tree -DoutputFile=target/maven_dep_tree.txt
       - persist_to_workspace: 
           root: . 
           paths:
-            - target
-      - run: 
-          name: Semgrep full scan
-          command: |
-            semgrep ci
-          
-  semgrep-diff-scan:
-    parameters:
-      default_branch:
-        type: string
-        default: main
+            - target 
+
+  scan:
     docker:
       - image: returntocorp/semgrep
     steps:
       - checkout
       - run: 
-          name: Semgrep diff scan
-          environment: 
-            SEMGREP_BASELINE_REF: << parameters.default_branch >>
-          command: |
-            echo "Running semgrep and dumping results to JSON file"
-            export SEMGREP_BASELINE_REF="origin/main"
-            export SEMGREP_COMMIT=$CIRCLE_SHA1
-            export SEMGREP_JOB_URL=$CIRCLE_BUILD_URL
-            git fetch origin "+refs/heads/*:refs/remotes/origin/*"
-            semgrep ci --baseline-commit=$(git merge-base main HEAD) 
+         name: Semgrep full scan
+         command: semgrep ci 
+         
+workflows:
+  version: 2
+  build_and_scan:
+    jobs:
+      - build
+      - scan:
+          requires:
+            - build 
