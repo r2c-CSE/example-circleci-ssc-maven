@@ -21,7 +21,7 @@ jobs:
     docker:
       - image: returntocorp/semgrep
     steps:
-      #- checkout
+      - checkout
       - attach_workspace: # This step attaches the workspace from the previous job
           at: /tmp/workspace
       - run: 
