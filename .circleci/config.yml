@@ -9,12 +9,11 @@ jobs:
       - run: 
           name: Generate Dependency File
           command: |
-            mkdir target
-            mvn dependency:tree -DoutputFile=target/maven_dep_tree.txt
+            mvn dependency:tree -DoutputFile=maven_dep_tree.txt
       - persist_to_workspace: 
           root: . 
           paths:
-            - target 
+            - maven_dep_tree.txt
 
   scan:
     docker:
@@ -22,11 +21,9 @@ jobs:
     steps:
       - attach_workspace: # This step attaches the workspace from the previous job
           at: /workspace 
-      - checkout
       - run: 
          name: Semgrep full scan
          command: |
-           ls /workspace/target
            semgrep ci 
          
 workflows:
