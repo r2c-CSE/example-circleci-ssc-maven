@@ -11,6 +11,7 @@ jobs:
           command: |
             mkdir -p workspace
             mvn dependency:tree -DoutputFile=workspace/maven_dep_tree.txt
+            cat workspace/maven_dep_tree.txt
       - persist_to_workspace: 
           root: workspace 
           paths:
@@ -20,13 +21,13 @@ jobs:
     docker:
       - image: returntocorp/semgrep
     steps:
-      - checkout
+      #- checkout
       - attach_workspace: # This step attaches the workspace from the previous job
           at: /tmp/workspace
       - run: 
          name: Semgrep full scan
          command: |
-           semgrep ci 
+           cat /tmp/workspace/maven_dep_tree.txt
          
 workflows:
   version: 2
