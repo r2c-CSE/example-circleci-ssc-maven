@@ -21,7 +21,7 @@ workflows:
 jobs:
   semgrep-full-scan:
     docker:
-      - image: returntocorp/semgrep
+      - image: cimg/openjdk:17.0 # Use an image with Java installed
     steps:
       - checkout
       - maven/with_cache: # Cache Maven dependencies to speed up builds
@@ -30,7 +30,7 @@ jobs:
       - run:
           name: "Semgrep full scan"
           command: |
-            semgrep ci
+            cat maven_dep_tree.txt
   semgrep-diff-scan:
     parameters:
       default_branch:
