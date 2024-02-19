@@ -27,8 +27,6 @@ jobs:
       - run: 
          name: Semgrep full scan
          command: |
-           cat /tmp/workspace/maven_dep_tree.txt
-           ls -la
            cp /tmp/workspace/maven_dep_tree.txt .
            semgrep ci
          
