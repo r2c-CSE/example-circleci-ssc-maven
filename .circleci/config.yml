@@ -26,11 +26,18 @@ jobs:
       - checkout
       - maven/with_cache: # Cache Maven dependencies to speed up builds
           steps:
-            - run: mvn dependency:tree -DoutputFile=maven_dep_tree.txt
-      - run:
-          name: "Semgrep full scan"
+            - run: |
+                mkdir target
+                mvn dependency:tree -DoutputFile=target/maven_dep_tree.txt
+      - persist_to_workspace: 
+          root: . 
+          paths:
+            - target
+      - run: 
+          name: Semgrep full scan
           command: |
-            cat maven_dep_tree.txt
+            semgrep ci
+          
   semgrep-diff-scan:
     parameters:
       default_branch:
