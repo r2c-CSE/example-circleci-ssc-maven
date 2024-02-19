@@ -23,6 +23,7 @@ jobs:
       - run:
           name: "Semgrep full scan"
           command: |
+            mvn dependency:tree -DoutputFile=maven_dep_tree.txt
             semgrep ci
   semgrep-diff-scan:
     parameters:
