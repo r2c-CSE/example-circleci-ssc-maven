@@ -1,4 +1,8 @@
 version: 2.1
+
+orbs:
+  maven: circleci/maven@1.0.1 # Use the Maven orb for simplified Maven execution
+  
 workflows:
   semgrep:
     jobs:
@@ -20,10 +24,12 @@ jobs:
       - image: returntocorp/semgrep
     steps:
       - checkout
+      - maven/with_cache: # Cache Maven dependencies to speed up builds
+          steps:
+            - run: mvn dependency:tree -DoutputFile=maven_dep_tree.txt
       - run:
           name: "Semgrep full scan"
           command: |
-            mvn dependency:tree -DoutputFile=maven_dep_tree.txt
             semgrep ci
   semgrep-diff-scan:
     parameters:
