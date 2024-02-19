@@ -9,9 +9,10 @@ jobs:
       - run: 
           name: Generate Dependency File
           command: |
-            mvn dependency:tree -DoutputFile=maven_dep_tree.txt
+            mkdir -p workspace
+            mvn dependency:tree -DoutputFile=workspace/maven_dep_tree.txt
       - persist_to_workspace: 
-          root: . 
+          root: workspace 
           paths:
             - maven_dep_tree.txt
 
@@ -21,7 +22,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace: # This step attaches the workspace from the previous job
-          at: /workspace 
+          at: /tmp/workspace
       - run: 
          name: Semgrep full scan
          command: |
